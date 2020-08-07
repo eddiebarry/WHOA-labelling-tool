@@ -1,3 +1,2 @@
 venv
-models/vac_safety/weights
-models/vac_safety/embedding_data
+models/vac_safety/embedding_data/GoogleNews-vectors-negative300.bin
