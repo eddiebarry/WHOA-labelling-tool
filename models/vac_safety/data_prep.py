@@ -25,7 +25,7 @@ def loadEmbeddingMatrix(typeToLoad, tokenizer):
     all_embs = np.stack(list(embeddings_index.values()))
     emb_mean,emb_std = all_embs.mean(), all_embs.std()
     
-    nb_words = len(tokenizer.word_index)
+    nb_words = len(tokenizer.word_index)+1
     #We are going to set the embedding size to the pretrained dimension as we are replicating it.
     #the size will be Number of Words in Vocab X Embedding Size
     embedding_matrix = np.random.normal(emb_mean, emb_std, (nb_words, embed_size))
@@ -88,18 +88,24 @@ def prepare_vaccine_data(train,test):
     train_pd = pd.read_csv(train)
     test_pd = pd.read_csv(test)
 
-    import pdb
-    pdb.set_trace()
-
     list_classes = \
-        ["toxic", "severe_toxic", "obscene", "threat", \
-        "insult", "identity_hate"]
-    y    = train_pd[list_classes].values
-    # y_te = test_pd[list_classes].values
+        ['Adults', 'Chickenpox vaccines', 'Diphtheria', \
+        'General immunization', 'HPV vaccines', 'Hepatitis A vaccine', \
+        'Hepatitis B vaccine', 'Immunization records', \
+        'Infants & young children', 'Influenza vaccines', 'Measles', \
+        'Meningococcal vaccines', 'Other', 'Pneumococcal vaccines', \
+        'Pregnancy', 'Rotavirus Vaccines', 'School-age children & teens', \
+        'Shingles vaccines', 'TB skin test', 'Travel vaccines', \
+        'Vaccine Schedules', 'Vaccine ingredients', 'Vaccine safety', \
+        'Where to get immunized', 'mumps and rubella vaccines', \
+        'tetanus and pertussis vaccines']
+
+    y = train_pd[list_classes].values
+    y_te = test_pd[list_classes].values
 
     # TODO change data size
-    list_sentences_train = train_pd["comment_text"]
-    list_sentences_test = test_pd["comment_text"]
+    list_sentences_train = train_pd["text"]
+    list_sentences_test  = test_pd["text"]
     
     tokenizer = Tokenizer(num_words=MAX_FEATURES)
     tokenizer.fit_on_texts(list(list_sentences_train))
@@ -115,8 +121,5 @@ def prepare_vaccine_data(train,test):
     embedding_matrix = loadEmbeddingMatrix('word2vec',\
         tokenizer=tokenizer)
 
-    return (X_t, y, X_te, list_sentences_test, list_classes, \
+    return (X_t, y, X_te, y_te, list_sentences_test, list_classes, \
         embedding_matrix, tokenizer)
-
-
-    

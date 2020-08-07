@@ -2,7 +2,7 @@ import os
 import keras
 import numpy as np
 import pandas as pd
-from data_prep import prepare_data
+from data_prep import prepare_data, prepare_vaccine_data
 from keras.layers import Dense, Input, LSTM, \
     Embedding, Dropout, Activation
 from keras.layers import Bidirectional, GlobalMaxPool1D,Bidirectional
@@ -24,23 +24,36 @@ class VacSafetyModel:
         self.model       = None
         self.labels      = None
         self.embedding_matrix = None
+        self.data_iden   = None
         
 
     
     def set_data(self, train, test, batch_size=None, maxlen=200, \
-        weight_dir = None):
+        weight_dir = None, data_name=None, num_classes=6):
         self.train_files = train
         self.test_files  = test
         if batch_size:
             self.batch_size = batch_size
         
-        self.train_data, self.train_labels, self.test_data, \
-            self.test_sentences, \
-            self.labels, \
-            self.embedding_matrix, \
-            self.tokenizer = prepare_data( \
-            train = self.train_files, \
-            test  = self.test_files)
+        if data_name == "vac_data":
+            self.train_data, self.train_labels, self.test_data, \
+                self.test_labels, \
+                self.test_sentences, \
+                self.labels, \
+                self.embedding_matrix, \
+                self.tokenizer = prepare_vaccine_data( \
+                train = self.train_files, \
+                test  = self.test_files)
+        else:
+            self.train_data, self.train_labels, self.test_data, \
+                self.test_sentences, \
+                self.labels, \
+                self.embedding_matrix, \
+                self.tokenizer = prepare_data( \
+                train = self.train_files, \
+                test  = self.test_files)
+            
+            self.data_iden = data_name
         
         if weight_dir:
             self.weight_dir = weight_dir
@@ -48,7 +61,7 @@ class VacSafetyModel:
         # save in dir
         self.colnames = ['text'] + self.labels
         
-        self.model = self.define(weight_dir)
+        self.model = self.define(weight_dir,num_classes=num_classes)
     
     def train(self, lr=1e-5, optim="Adam", loss="BCE", epochs=1):
         if loss == "BCE":
@@ -89,13 +102,17 @@ class VacSafetyModel:
         # save confidences and text
         test_df = pd.DataFrame(text_and_confs,columns=self.colnames)
         test_df.to_csv(self.result_dir)
+
+        if self.data_iden == "vac_data":
+            # Evaluate the model
+            self.model.evaluate(self.test_data, self.test_labels)
         
 
-    def define(self, weight_dir=None):
+    def define(self, weight_dir=None,num_classes=6):
         #maxlen=200 as defined earlier
         inp = Input(shape=(self.maxlen, )) 
         
-        x = Embedding(len(self.tokenizer.word_index), \
+        x = Embedding(len(self.tokenizer.word_index)+1, \
             self.embedding_matrix.shape[1], \
             weights=[self.embedding_matrix], \
             trainable=False)(inp)
@@ -114,7 +131,7 @@ class VacSafetyModel:
 
         x = Dropout(0.1)(x)
 
-        x = Dense(6, activation="sigmoid")(x)
+        x = Dense(num_classes, activation="sigmoid")(x)
 
         model = Model(inputs=inp, outputs=x)
 
