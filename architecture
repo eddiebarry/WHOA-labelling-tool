@@ -1,0 +1,24 @@
+First we define the input out format
+
+Then we store the data
+    data/train/name_project/a1.csv, a2.csv, a3.csv ...
+    data/test/name_project/a1.csv, a2.csv, a3.csv ...
+
+Then we define the model we are using
+    models/name_project/model.py
+
+    model must implement train and test method
+    as well as set data method
+
+    SetDataMethod
+        add links to every relevant file which needs to be
+        processed for training / testing
+
+        Model class should define how files are processed
+
+
+Presentation tools
+    save question and labels to a new csv file
+
+to run demo :
+    python run_labelling.py name_project
