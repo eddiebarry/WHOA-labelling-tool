@@ -1,0 +1,12 @@
+Models are the extensible part of this project
+
+They implement 3 basic functions
+
+1) Data input
+
+2) Data training
+
+3) Data testing and storing of results
+
+Within a model, we can have different data ingestion methods 
+which are implemented as required

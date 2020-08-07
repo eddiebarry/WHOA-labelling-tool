@@ -1,6 +1,7 @@
 import os
 import keras
 import numpy as np
+import pandas as pd
 from data_prep import prepare_data
 from keras.layers import Dense, Input, LSTM, \
     Embedding, Dropout, Activation
@@ -43,6 +44,9 @@ class VacSafetyModel:
         
         if weight_dir:
             self.weight_dir = weight_dir
+
+        # save in dir
+        self.colnames = ['text'] + self.train_labels
         
         self.model = self.define(weight_dir)
     
@@ -63,8 +67,16 @@ class VacSafetyModel:
 
         return hist
         
-
     def test(self,save_dir):
+        '''
+        input save directory
+        
+        Assumes that training data is of the format [num_sent, 200]
+        Output will be of the format [num_sent, num_labels]
+        
+        The data will be saved in a csv [num_sent, num_labels+1]
+        where axis 1 has confidence values
+        '''
         self.result_dir = os.path.join(save_dir,'results.csv')
         preds = self.model.predict(self.test_data[:100])
         print("predictions done")
@@ -73,13 +85,9 @@ class VacSafetyModel:
         text = np.array(self.test_sentences,dtype='str')
         text = np.expand_dims(text, axis=1)
         text_and_confs = np.concatenate((text,preds),axis=1)
-        
-        # save in dir
-        names = ['text']
-        names = names + self.train_labels
 
         # save confidences and text
-        test_df = pd.DataFrame(text_and_confs,columns=names)
+        test_df = pd.DataFrame(text_and_confs,columns=self.colnames)
         test_df.to_csv(self.result_dir)
         
 

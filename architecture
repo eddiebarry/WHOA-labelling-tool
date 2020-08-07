@@ -16,9 +16,10 @@ Then we define the model we are using
 
         Model class should define how files are processed
 
-
 Presentation tools
     save question and labels to a new csv file
 
-to run demo :
+To run demo :
     python run_labelling.py name_project
+
+For exact Model architecture, refer to the doc present in the "models" folder
