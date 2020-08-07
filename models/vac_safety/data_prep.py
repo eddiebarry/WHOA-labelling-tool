@@ -63,6 +63,7 @@ def prepare_data(train, test):
     y    = train_pd[list_classes].values
     # y_te = test_pd[list_classes].values
 
+    # TODO change data size
     list_sentences_train = train_pd["comment_text"]
     list_sentences_test = test_pd["comment_text"]
     
@@ -82,5 +83,40 @@ def prepare_data(train, test):
 
     return (X_t, y, X_te, list_sentences_test, list_classes, \
         embedding_matrix, tokenizer)
+
+def prepare_vaccine_data(train,test):    
+    train_pd = pd.read_csv(train)
+    test_pd = pd.read_csv(test)
+
+    import pdb
+    pdb.set_trace()
+
+    list_classes = \
+        ["toxic", "severe_toxic", "obscene", "threat", \
+        "insult", "identity_hate"]
+    y    = train_pd[list_classes].values
+    # y_te = test_pd[list_classes].values
+
+    # TODO change data size
+    list_sentences_train = train_pd["comment_text"]
+    list_sentences_test = test_pd["comment_text"]
+    
+    tokenizer = Tokenizer(num_words=MAX_FEATURES)
+    tokenizer.fit_on_texts(list(list_sentences_train))
+    list_tokenized_train = tokenizer.texts_to_sequences(\
+        list_sentences_train)
+    list_tokenized_test = tokenizer.texts_to_sequences(\
+        list_sentences_test)
+    
+    maxlen = 200
+    X_t = pad_sequences(list_tokenized_train, maxlen=maxlen)
+    X_te = pad_sequences(list_tokenized_test, maxlen=maxlen)
+
+    embedding_matrix = loadEmbeddingMatrix('word2vec',\
+        tokenizer=tokenizer)
+
+    return (X_t, y, X_te, list_sentences_test, list_classes, \
+        embedding_matrix, tokenizer)
+
 
     

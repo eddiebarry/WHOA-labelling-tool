@@ -8,7 +8,7 @@ name_project   = sys.argv[1]
 model_dir      = "models/"+name_project+"/model.py"
 train_data_dir = "data/train/"+name_project+"/"
 test_data_dir  = "data/test/"+name_project+"/"
-weight_dir     = "models/vac_safety/weights/model.h5"
+weight_dir     = "models/vac_safety/weights/model.hdf5"
 batch_size = 16
 
 # read data

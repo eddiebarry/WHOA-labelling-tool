@@ -46,7 +46,7 @@ class VacSafetyModel:
             self.weight_dir = weight_dir
 
         # save in dir
-        self.colnames = ['text'] + self.train_labels
+        self.colnames = ['text'] + self.labels
         
         self.model = self.define(weight_dir)
     
@@ -78,7 +78,7 @@ class VacSafetyModel:
         where axis 1 has confidence values
         '''
         self.result_dir = os.path.join(save_dir,'results.csv')
-        preds = self.model.predict(self.test_data[:100])
+        preds = self.model.predict(self.test_data)
         print("predictions done")
 
         # save to numpy
